@@ -1,3 +1,3 @@
 fn main() {
-    println!("Happy hacking!");
+    println!("first Commit!");
 }
