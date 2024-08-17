@@ -1,3 +1,8 @@
+mod Bleachers;
+
+use crate::Bleachers::generateAndShow;
+
 fn main() {
-    println!("first Commit!");
+    generateAndShow();
+    start();
 }
