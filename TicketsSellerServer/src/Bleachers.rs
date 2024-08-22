@@ -1,6 +1,6 @@
 use std::cmp::PartialEq;
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 enum Visibility {
     //Visibility categorie
     Excellent,
@@ -8,7 +8,7 @@ enum Visibility {
     Regular
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 enum Block {
     VIP,
     A1,
@@ -17,14 +17,14 @@ enum Block {
     C
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 enum Status {
     Available,
     Reserved,
     Sold
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct Site {
     block: Block,
     visibility: Visibility,
@@ -210,44 +210,48 @@ fn matrixSeats() -> Vec<Vec<Site>> {
     seats
 }
 
-
-//Implementing PartialEq for the enums
-impl PartialEq for Status {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-impl PartialEq for Block {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-
-//Search n many seats together
-pub fn searchSeats(n: i32, block: Block) -> Vec<Site>{
-    let seats = matrixSeats();
-    let mut result: Vec<Site> = Vec::new();
-    let mut count = 0;
-    for row in seats.iter(){
-        for site in row.iter(){
-            if site.block == block && site.status == Status::Available {
-                result.push(site.clone()); //Revisar
-                count += 1;
-            }
-            if count == n {
-                return result;
+pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
+    let mut collection_request:Vec<&str> = request.split('/').collect();
+    let seats:u32 = collection_request[0].parse().expect("Number Invalid");
+    let block = collection_request[1];
+    let mut selected_seats: Vec<&mut Site> = Vec::new();
+    if(seats<=10){
+        if(block=="VIP"){
+            for index_row in 0..5 {
+                for seat in &mut bleachers[index_row] {
+                    let mut avalible_seats = 0;
+                    match seat.status {
+                        Status::Available => {
+                            avalible_seats += 1;
+                            selected_seats.push(seat);
+                        }
+                        Status::Sold => {
+                            avalible_seats = 0;
+                            selected_seats.clear();
+                        }
+                        Status::Reserved => {
+                            avalible_seats = 0;
+                            selected_seats.clear();
+                        }
+                    }
+                    if avalible_seats == seats {
+                        println!("found seats");
+                    }
+                }
             }
         }
+
     }
-    result
+
 }
 
-
 pub fn generateAndShow(){
-    let seats = matrixSeats();
+    let mut seats = matrixSeats();
     for row in seats.iter(){
         for site in row.iter(){
             println!("Block: {:?}, Visibility: {:?}, Row: {}, Seat: {} - Status: {:?}", site.block, site.visibility, site.row, site.seat, site.status);
         }
     }
+
+    search_sites("2/VIP".to_string(), &mut seats);
 }
