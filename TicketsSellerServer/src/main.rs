@@ -5,4 +5,5 @@ use crate::network::server::run_server;
 
 fn main() {
     generateAndShow();
+    run_server();
 }
