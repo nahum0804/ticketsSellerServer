@@ -252,6 +252,5 @@ pub fn generateAndShow(){
             println!("Block: {:?}, Visibility: {:?}, Row: {}, Seat: {} - Status: {:?}", site.block, site.visibility, site.row, site.seat, site.status);
         }
     }
-
     search_sites("2/VIP".to_string(), &mut seats);
 }
