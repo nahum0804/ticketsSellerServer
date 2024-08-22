@@ -210,39 +210,7 @@ fn matrixSeats() -> Vec<Vec<Site>> {
     seats
 }
 
-
-//Implementing PartialEq for the enums
-impl PartialEq for Status {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-impl PartialEq for Block {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-
-//Search n many seats together
-pub fn searchSeats(n: i32, block: Block) -> Vec<Site>{
-    let seats = matrixSeats();
-    let mut result: Vec<Site> = Vec::new();
-    let mut count = 0;
-    for row in seats.iter(){
-        for site in row.iter(){
-            if site.block == block && site.status == Status::Available {
-                result.push(site.clone()); //Revisar
-                count += 1;
-            }
-            if count == n {
-                return result;
-            }
-        }
-    }
-    result
-}
-
-pub fn serch_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
+pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
     let mut collection_request:Vec<&str> = request.split('/').collect();
     let seats:u32 = collection_request[0].parse().expect("Number Invalid");
     let block = collection_request[1];
@@ -278,10 +246,12 @@ pub fn serch_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
 }
 
 pub fn generateAndShow(){
-    let seats = matrixSeats();
+    let mut seats = matrixSeats();
     for row in seats.iter(){
         for site in row.iter(){
             println!("Block: {:?}, Visibility: {:?}, Row: {}, Seat: {} - Status: {:?}", site.block, site.visibility, site.row, site.seat, site.status);
         }
     }
+
+    search_sites("2/VIP".to_string(), &mut seats);
 }
