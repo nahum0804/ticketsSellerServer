@@ -210,22 +210,32 @@ fn matrixSeats() -> Vec<Vec<Site>> {
     seats
 }
 
+#[derive(Debug,Clone)]
+struct Sel_site {
+    row_index: usize,
+    site_index: usize
+}
+
 pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
     let mut collection_request:Vec<&str> = request.split('/').collect();
     let seats:u32 = collection_request[0].parse().expect("Number Invalid");
     let block = collection_request[1];
-    let mut selected_seats: Vec<&mut Site> = Vec::new();
+    let mut selected_seats: Vec<Sel_site> = Vec::new();
+    let mut avalible_seats = 0;
     if(seats<=10){
         if(block=="VIP"){
+            println!("si es vip");
             for index_row in 0..5 {
+                avalible_seats = 0;
                 for seat in &mut bleachers[index_row] {
-                    let mut avalible_seats = 0;
                     match seat.status {
                         Status::Available => {
+                            println!("disponible");
                             avalible_seats += 1;
-                            selected_seats.push(seat);
+                            selected_seats.push( Sel_site{site_index:seat.seat as usize, row_index:index_row});
                         }
                         Status::Sold => {
+                            println!("Vendido");
                             avalible_seats = 0;
                             selected_seats.clear();
                         }
@@ -236,8 +246,10 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
                     }
                     if avalible_seats == seats {
                         println!("found seats");
+                        return;
                     }
                 }
+
             }
         }
 
@@ -247,11 +259,13 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
 
 pub fn generateAndShow(){
     let mut seats = matrixSeats();
+    /*
     for row in seats.iter(){
         for site in row.iter(){
             println!("Block: {:?}, Visibility: {:?}, Row: {}, Seat: {} - Status: {:?}", site.block, site.visibility, site.row, site.seat, site.status);
         }
     }
+     */
 
     search_sites("2/VIP".to_string(), &mut seats);
 }
