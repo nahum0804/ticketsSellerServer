@@ -1,4 +1,5 @@
 use std::cmp::PartialEq;
+use crate::Bleachers::Status::Reserved;
 
 #[derive(Debug,Clone)]
 enum Visibility {
@@ -6,6 +7,18 @@ enum Visibility {
     Excellent,
     Good,
     Regular
+}
+
+impl PartialEq for Visibility {
+    fn eq(&self, other: &Self) -> bool {
+        // Compara las variantes directamente
+        match (self, other) {
+            (Visibility::Excellent, Visibility::Excellent) => true,
+            (Visibility::Good, Visibility::Good) => true,
+            (Visibility::Regular, Visibility::Regular) => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug,Clone)]
@@ -216,45 +229,74 @@ struct Sel_site {
     site_index: usize
 }
 
-pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>){
+fn serch_row_block(bleachers:&mut Vec<Vec<Site>>){
+
+}
+
+fn majority(m_visibility:Visibility, blok:&Vec<Sel_site>, bleachers:&mut Vec<Vec<Site>>) ->bool{
+    let mut count = 0;
+    for x in blok{
+        if(bleachers[x.row_index][x.site_index].visibility==m_visibility){
+            count +=1;
+        }
+    }
+    if(count as usize>=blok.len()){
+        return true;
+    }
+    return false;
+}
+
+pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->String{
     let mut collection_request:Vec<&str> = request.split('/').collect();
     let seats:u32 = collection_request[0].parse().expect("Number Invalid");
     let block = collection_request[1];
     let mut selected_seats: Vec<Sel_site> = Vec::new();
     let mut avalible_seats = 0;
-    if(seats<=10){
-        if(block=="VIP"){
-            println!("si es vip");
-            for index_row in 0..5 {
-                avalible_seats = 0;
-                for seat in &mut bleachers[index_row] {
-                    match seat.status {
-                        Status::Available => {
-                            println!("disponible");
-                            avalible_seats += 1;
-                            selected_seats.push( Sel_site{site_index:seat.seat as usize, row_index:index_row});
-                        }
-                        Status::Sold => {
-                            println!("Vendido");
-                            avalible_seats = 0;
-                            selected_seats.clear();
-                        }
-                        Status::Reserved => {
-                            avalible_seats = 0;
-                            selected_seats.clear();
-                        }
+    let mut possible_blocks: Vec<Vec<Sel_site>> = Vec::new();
+    if(block=="VIP"){
+        for index_row in 0..5 {
+            avalible_seats = 0;
+            for seat in &mut bleachers[index_row] {
+                match seat.status {
+                    Status::Available => {
+                        println!("disponible");
+                        avalible_seats += 1;
+                        selected_seats.push( Sel_site{site_index:seat.seat as usize, row_index:index_row});
                     }
-                    if avalible_seats == seats {
-                        println!("found seats");
-                        return;
+                    Status::Sold => {
+                        println!("Vendido");
+                        avalible_seats = 0;
+                        if selected_seats.len()>=(seats as usize/2){
+                            possible_blocks.push(selected_seats.clone());
+                        }
+                        selected_seats.clear();
+                    }
+                    Status::Reserved => {
+                        avalible_seats = 0;
+                        if selected_seats.len()>=(seats as usize/2){
+                            possible_blocks.push(selected_seats.clone());
+                        }
+                        selected_seats.clear();
                     }
                 }
+                if avalible_seats == seats {
+                    possible_blocks.push(selected_seats.clone());
+                }
+            }
 
+        }
+        for option in possible_blocks.iter().rev() {
+            if(option.len()==seats as usize && majority(Visibility::Excellent,option,bleachers)){
+                let mut ret=String::new();
+                for x in option{
+                    bleachers[x.row_index][x.site_index].status=Reserved;
+                    ret += &format!("Row number: {} Seat number {}\n", x.row_index, x.site_index);
+                }
+                return ret;
             }
         }
-
     }
-
+    return "none".to_string();
 }
 
 pub fn generateAndShow(){
