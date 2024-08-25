@@ -248,13 +248,19 @@ pub fn majority(m_visibility:Visibility, blok:&Vec<Sel_site>, bleachers:&mut Vec
 
 // Trabajar aquí - Mejorar la busqueda en otras filas (Buscar posibles campos)
 pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->String {
+
     let mut collection_request: Vec<&str> = request.split('/').collect();
     let seats: u32 = collection_request[0].parse().expect("Number Invalid");
+    let limit_seats = 12;
     let block = collection_request[1];
     let mut selected_seats: Vec<Sel_site> = Vec::new();
     let mut avalible_seats = 0;
     let mut possible_blocks: Vec<Vec<Sel_site>> = Vec::new();
     let mut min_row = usize::MAX;
+
+    if seats > limit_seats {
+        return "The number of seats exceeds the limit".to_string();
+    }
 
     match block {
         "VIP" => {
@@ -448,6 +454,8 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->String {
         }
     }
 
+    let mut mixed_blocks: Vec<Vec<Sel_site>> = Vec::new();
+
     for option in possible_blocks.iter() {
         if option.len() == seats as usize && majority(Visibility::Excellent, option, bleachers) {
             let mut ret = String::new();
@@ -463,7 +471,42 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->String {
                 }
             }
             return ret;
+        } else {
+            // Add for me ------------------------------------- Make new sites
+            for y in option {
+                if y.row_index < min_row {
+                    min_row = y.row_index;
+                }
+            }
+            for y in option {
+                if mixed_blocks.len() == 0 {
+                    bleachers[y.row_index][y.site_index - 1].status = Reserved;
+                    //Create Sel_site and push it
+                    let mut new_option: Vec<Sel_site> = Vec::new();
+                    new_option.push(Sel_site { row_index: y.row_index, site_index: y.site_index });
+                    mixed_blocks.push(new_option);
+                } else {
+                    for i in mixed_blocks.iter_mut() {
+                        if i.len() + option.len() == seats as usize {
+                            bleachers[y.row_index][y.site_index - 1].status = Reserved;
+                            i.extend(option.clone());
+                        }
+                    }
+                    for i in mixed_blocks.iter() {
+                        if i.len() == seats as usize {
+                            let mut ret = String::new();
+                            for x in i {
+                                ret += &format!("Row number: {} Seat number {}, in block {}\n", bleachers[x.row_index][x.site_index - 1].row, x.site_index, block);
+                            }
+                            return ret;
+                        }
+                    }
+                }
+            }
         }
+        // --------------------------------------------
     }
+
     return "none".to_string();
+
 }
