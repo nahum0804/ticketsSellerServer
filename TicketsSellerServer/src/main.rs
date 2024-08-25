@@ -1,9 +1,9 @@
 mod Bleachers;
-mod network;
-use crate::Bleachers::generateAndShow;
-use crate::network::server::run_server;
+
+mod server;
+use crate::server::start_server;
+
 
 fn main() {
-    generateAndShow();
-    run_server();
+    start_server();
 }
