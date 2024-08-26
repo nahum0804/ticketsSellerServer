@@ -15,8 +15,8 @@ def enviar_request():
         s.connect((HOST, PORT))
 
         bloque = random.choice(BLOQUES)
-        cantidad_asientos = random.randint(1, 60)
-        mensaje = f"{cantidad_asientos}/{bloque}"
+        cantidad_asientos = random.randint(1, 12)
+        mensaje = f"{15}/{bloque}"
 
         start_time = time.time()
         s.sendall(mensaje.encode())
@@ -38,7 +38,7 @@ def enviar_request():
 def realizar_peticiones_en_lotes():
     time.sleep(5)
     with ThreadPoolExecutor(max_workers=5) as executor:
-        for _ in range(3):
+        for _ in range(2):
             futures = [executor.submit(enviar_request) for _ in range(2)]
 
             for future in futures:
