@@ -16,7 +16,7 @@ def enviar_request():
 
         bloque = random.choice(BLOQUES)
         cantidad_asientos = random.randint(1, 12)
-        mensaje = f"{15}/{bloque}"
+        mensaje = f"{18}/{'VIP'}"
 
         start_time = time.time()
         s.sendall(mensaje.encode())
@@ -39,7 +39,7 @@ def realizar_peticiones_en_lotes():
     time.sleep(5)
     with ThreadPoolExecutor(max_workers=5) as executor:
         for _ in range(2):
-            futures = [executor.submit(enviar_request) for _ in range(2)]
+            futures = [executor.submit(enviar_request) for _ in range(1)]
 
             for future in futures:
                 future.result()

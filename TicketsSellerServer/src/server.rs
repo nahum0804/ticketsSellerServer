@@ -31,9 +31,34 @@ fn handle_request(mut stream: TcpStream, seats: Arc<Mutex<Vec<Vec<Site>>>>) {
 
     // Llamar a la función search_sites con la solicitud recibida
     let response = search_sites(request, &mut seats);
-
+    let mut resp= String::new();
+    print!("\n\n");
+    if response.is_empty(){
+        resp = "Not foud seats".to_string();
+    }else {
+        for seat in &response {
+            let mut block = "";
+            match seats[seat.row_index][seat.site_index - 1].clone().block{
+                Block::VIP=>{
+                    block = "VIP";
+                }
+                Block::A1 =>{
+                    block = "A1";
+                }
+                Block::A2 =>{
+                    block = "A2";
+                }
+                Block::B =>{
+                    block = "B";
+                }Block::C =>{
+                    block = "C";
+                }
+            }
+            resp += &format!("Row number: {} Seat number {}, in block {}\n", seats[seat.row_index][seat.site_index - 1].row,seat.site_index,block);
+        }
+    }
     // Escribir la respuesta de vuelta al cliente
-    stream.write(response.as_bytes()).unwrap();
+    stream.write(resp.as_bytes()).unwrap();
     stream.flush().unwrap();
 
     // Esperar la respuesta de confirmación del cliente ("yes" o "no")
@@ -45,10 +70,16 @@ fn handle_request(mut stream: TcpStream, seats: Arc<Mutex<Vec<Vec<Site>>>>) {
     println!("Confirmación recibida del cliente: {}", confirmation);
 
     // Opcionalmente, puedes agregar lógica adicional basada en la confirmación aquí
-    if confirmation == "yes" {
-        println!("El cliente confirmó la reserva.");
-    } else if confirmation == "no" {
-        println!("El cliente rechazó la reserva.");
+    if confirmation == "yes" && resp != "Not foud seats"{
+        for seat in response.clone() {
+             seats[seat.row_index][seat.site_index - 1].status = Status::Sold;
+        }
+        println!("El cliente confirmó la reserva los asientos se compraron correctamente");
+    } else if confirmation == "no" || resp == "Not foud seats"{
+        for seat in response {
+            seats[seat.row_index][seat.site_index - 1].status = Status::Available;
+        }
+        println!("El cliente rechazó la reserva los asientos quedaron disponibles.");
         // Aquí podrías revertir la reserva en bleachers si es necesario
     }
 }
