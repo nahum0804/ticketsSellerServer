@@ -497,7 +497,6 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site
         }
 
         let mut possible_resp:Vec<Vec<Sel_site>> = Vec::new();
-        let mut ret = String::new();
 
         for option in possible_blocks.iter() {
             if option.len() == seats as usize {
@@ -517,7 +516,6 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site
             for x in possible_resp[index].clone() {
                 bleachers[x.row_index][x.site_index - 1].status = Reserved;
                 final_answer.push(x);
-                //ret += &format!("Row number: {} Seat number {}, in block {}\n", bleachers[x.row_index][x.site_index - 1].row, x.site_index, block);
             }
             return final_answer;
         }
@@ -645,26 +643,14 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site
             for x in possible_resp[index].clone() {
                 bleachers[x.row_index][x.site_index - 1].status = Status::Reserved;
                 final_answer.push(x);
-                //ret += &format!(
-                //    "Row number: {} Seat number {}, in block {}\n",
-                //    bleachers[x.row_index][x.site_index - 1].row, x.site_index, block
-                //);
             }
             for x in possible_resp[index+1].clone() {
                 bleachers[x.row_index][x.site_index - 1].status = Status::Reserved;
                 final_answer.push(x);
-                //ret += &format!(
-                //    "Row number: {} Seat number {}, in block {}\n",
-                //    bleachers[x.row_index][x.site_index - 1].row, x.site_index, block
-                //);
             }
             for x in possible_resp[index+2].clone() {
                 bleachers[x.row_index][x.site_index - 1].status = Status::Reserved;
                 final_answer.push(x);
-                //ret += &format!(
-                //    "Row number: {} Seat number {}, in block {}\n",
-                //    bleachers[x.row_index][x.site_index - 1].row, x.site_index, block
-                //);
             }
             return final_answer;
         }
