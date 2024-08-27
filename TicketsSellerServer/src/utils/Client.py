@@ -18,11 +18,11 @@ def enviar_request():
             cantidad_asientos = random.randint(1, 15)
             mensaje = f"{cantidad_asientos}/{bloque}"
 
-            start_time = time.time()
+            start_time = time.perf_counter()
             s.sendall(mensaje.encode())
 
             data1 = s.recv(1024)
-            end_time = time.time()
+            end_time = time.perf_counter()
 
             tiempo_respuesta = end_time - start_time
 
