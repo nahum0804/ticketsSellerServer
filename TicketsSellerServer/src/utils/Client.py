@@ -33,12 +33,13 @@ def enviar_request():
             s.sendall(confirmacion.encode())
 
             data = s.recv(1024)
+            time.sleep(0.01)
             print(f"\n\nPeticion enviada: {mensaje}")
             print(f"\nRespuesta del servidor:\n{data1.decode()}")
-            print(f"Tiempo de respuesta: {tiempo_respuesta:.100f} segundos")
-            print(f"Cliente respondio: {confirmacion}")
-            print(f"Con un tiempo de espera de: {wait_time}")
-            print(f"{data.decode()}")
+            print(f"Tiempo de respuesta: {tiempo_respuesta:.10f} segundos")
+            print(f"\nCliente respondio: {confirmacion}")
+            print(f"\nCon un tiempo de espera de: {wait_time}")
+            print(f"\n{data.decode()}")
 
     except ConnectionAbortedError as e:
         print(f"Connection was aborted: {e}")

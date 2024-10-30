@@ -48,6 +48,12 @@ pub struct Site {
     seat: i32,
     pub(crate) status: Status
 }
+impl Site {
+    // Implementamos un método para imprimir solo row, seat, y status
+    pub fn print_seat_info(&self) {
+        println!("Row: {}, Seat: {}, Status: {:?}", self.row, self.seat, self.status);
+    }
+}
 
 
 pub fn matrixSeats() -> Vec<Vec<Site>> {
@@ -224,6 +230,39 @@ pub fn matrixSeats() -> Vec<Vec<Site>> {
                 Site { block: Block::C, visibility: Visibility::Regular, row: 3, seat: 10, status: Status::Available }]
         ];
     seats
+}
+
+impl PartialEq for Status {
+    fn eq(&self, other: &Self) -> bool {
+        // Comparación directa de dos estados
+        match (self, other) {
+            (Status::Available, Status::Available) => true,
+            (Status::Reserved, Status::Reserved) => true,
+            (Status::Sold, Status::Sold) => true,
+            _ => false,
+        }
+    }
+}
+
+
+pub fn get_non_available_sites(seats:&mut Vec<Vec<Site>>) -> String {
+    let mut result = String::new();
+
+    for row in seats {
+        for site in row {
+            if site.status != Status::Available {
+                let site_info = format!("{:?},{:?},{},{}|", site.block, site.status, site.row, site.seat);
+                result.push_str(&site_info);
+            }
+        }
+    }
+
+    // Remover el último '|' si existe
+    if result.ends_with('|') {
+        result.pop();
+    }
+
+    result
 }
 
 #[derive(Debug,Clone)]
