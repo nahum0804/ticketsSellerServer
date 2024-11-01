@@ -1,7 +1,7 @@
 use std::cmp::PartialEq;
 use std::{fmt, thread};
 use crate::Bleachers::Status::Reserved;
-use std::sync::{Arc, Mutex};
+
 
 
 #[derive(Debug,Clone)]
@@ -49,7 +49,6 @@ pub struct Site {
     pub(crate) status: Status
 }
 impl Site {
-    // Implementamos un método para imprimir solo row, seat, y status
     pub fn print_seat_info(&self) {
         println!("Row: {}, Seat: {}, Status: {:?}", self.row, self.seat, self.status);
     }
@@ -767,4 +766,33 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site
 
     return final_answer;
 
+}
+
+pub fn get_better_three(request:String, bleachers:&mut Vec<Vec<Site>>) -> Vec<Vec<Sel_site>> {
+
+    let mut possible_blocks: Vec<Vec<Sel_site>> = Vec::new();
+
+    for i in 0..3 {
+        let tmpArray = search_sites(request.clone(), bleachers);
+        possible_blocks.append(&mut vec![tmpArray]);
+    }
+    return possible_blocks;
+}
+
+pub fn gestor_better_three(index:i8, options:&mut Vec<Vec<Sel_site>>, bleachers:&mut Vec<Vec<Site>>) {
+
+    let listaEscogida = options[index as usize].clone();
+
+    for i in listaEscogida {
+        bleachers[i.row_index][i.site_index - 1].status = Status::Reserved;
+    }
+
+     let mut lista_filtrada = options.clone();
+        lista_filtrada.remove(index as usize);
+
+    for j in lista_filtrada {
+        for i in j {
+            bleachers[i.row_index][i.site_index - 1].status = Status::Available;
+        }
+    }
 }
