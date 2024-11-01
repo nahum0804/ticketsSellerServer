@@ -763,36 +763,57 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site
             }
         }
     }
-
     return final_answer;
-
 }
 
-pub fn get_better_three(request:String, bleachers:&mut Vec<Vec<Site>>) -> Vec<Vec<Sel_site>> {
-
+pub fn get_better_three(request: String, bleachers: &mut Vec<Vec<Site>>) -> Vec<Vec<Sel_site>> {
     let mut possible_blocks: Vec<Vec<Sel_site>> = Vec::new();
 
-    for i in 0..3 {
-        let tmpArray = search_sites(request.clone(), bleachers);
-        possible_blocks.append(&mut vec![tmpArray]);
+    // Llenar los bloques posibles y cambiar el estado de cada asiento a 'Reserved'
+    for _ in 0..3 {
+        let mut tmp_array = search_sites(request.clone(), bleachers);
+
+        // Cambiar el estado de cada asiento en tmp_array a 'Reserved'
+        for seat in &tmp_array {
+            bleachers[seat.row_index][seat.site_index - 1].status = Status::Reserved;
+        }
+
+        possible_blocks.push(tmp_array);
     }
-    return possible_blocks;
+
+    possible_blocks
 }
 
-pub fn gestor_better_three(index:i8, options:&mut Vec<Vec<Sel_site>>, bleachers:&mut Vec<Vec<Site>>) {
+pub fn gestor_better_three(index: i8, options: Vec<Vec<Sel_site>>, bleachers:&mut Vec<Vec<Site>>) {
+
+    if index == -1 {
+        //Chack like available all seats selected
+        for j in options {
+            for i in j {
+                bleachers[i.row_index][i.site_index - 1].status = Status::Available;
+            }
+        }
+        return;
+    }
 
     let listaEscogida = options[index as usize].clone();
 
     for i in listaEscogida {
-        bleachers[i.row_index][i.site_index - 1].status = Status::Reserved;
+        bleachers[i.row_index][i.site_index - 1].status = Status::Sold;
     }
 
-     let mut lista_filtrada = options.clone();
-        lista_filtrada.remove(index as usize);
+    let mut lista_filtrada = options.clone();
+    lista_filtrada.remove(index as usize);
 
     for j in lista_filtrada {
         for i in j {
             bleachers[i.row_index][i.site_index - 1].status = Status::Available;
         }
+    }
+
+    //Confirm in console changes - Show the selected seats
+    println!("Selected seats:");
+    for i in listaEscogida {
+        println!("Row: {}, Seat: {} , Status: {:?}", i.row_index, i.site_index, bleachers[i.row_index][i.site_index - 1].status);
     }
 }
