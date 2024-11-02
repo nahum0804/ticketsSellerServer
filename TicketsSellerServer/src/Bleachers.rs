@@ -1,7 +1,8 @@
 use std::cmp::PartialEq;
 use std::{fmt, thread};
 use crate::Bleachers::Status::Reserved;
-
+use serde_json::json;
+use serde::{Serialize, Deserialize};
 
 
 #[derive(Debug,Clone)]
@@ -264,8 +265,7 @@ pub fn get_non_available_sites(seats:&mut Vec<Vec<Site>>) -> String {
     result
 }
 
-#[derive(Debug,Clone)]
-#[derive(Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Sel_site {
     pub(crate) row_index: usize,
     pub(crate) site_index: usize
@@ -327,7 +327,6 @@ fn block_congruents_3(blocks: &Vec<Vec<Sel_site>>) -> bool {
     false
 }
 
-// Trabajar aquí - Mejorar la busqueda en otras filas (Buscar posibles campos)
 pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site> {
 
     let mut collection_request: Vec<&str> = request.split('/').collect();
@@ -769,19 +768,17 @@ pub fn search_sites(request:String, bleachers:&mut Vec<Vec<Site>>)->Vec<Sel_site
 pub fn get_better_three(request: String, bleachers: &mut Vec<Vec<Site>>) -> Vec<Vec<Sel_site>> {
     let mut possible_blocks: Vec<Vec<Sel_site>> = Vec::new();
 
-    // Llenar los bloques posibles y cambiar el estado de cada asiento a 'Reserved'
     for _ in 0..3 {
         let mut tmp_array = search_sites(request.clone(), bleachers);
 
-        // Cambiar el estado de cada asiento en tmp_array a 'Reserved'
         for seat in &tmp_array {
             bleachers[seat.row_index][seat.site_index - 1].status = Status::Reserved;
         }
-
-        possible_blocks.push(tmp_array);
+        possible_blocks.push(tmp_array.clone());
+        tmp_array.clear();
     }
 
-    possible_blocks
+    return possible_blocks;
 }
 
 pub fn gestor_better_three(index: i8, options: Vec<Vec<Sel_site>>, bleachers:&mut Vec<Vec<Site>>) {
@@ -798,14 +795,14 @@ pub fn gestor_better_three(index: i8, options: Vec<Vec<Sel_site>>, bleachers:&mu
 
     let listaEscogida = options[index as usize].clone();
 
-    for i in listaEscogida {
+    for i in &listaEscogida {
         bleachers[i.row_index][i.site_index - 1].status = Status::Sold;
     }
 
     let mut lista_filtrada = options.clone();
     lista_filtrada.remove(index as usize);
 
-    for j in lista_filtrada {
+    for j in &lista_filtrada {
         for i in j {
             bleachers[i.row_index][i.site_index - 1].status = Status::Available;
         }
