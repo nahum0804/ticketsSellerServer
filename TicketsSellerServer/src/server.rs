@@ -60,7 +60,7 @@ fn format_seats_as_json(response: &Vec<Vec<Sel_site>>) -> String {
 
 fn await_confirmation(stream: &mut TcpStream) -> i8 {
     // Esperar confirmación y manejar expiración
-    stream.set_read_timeout(Some(Duration::new(120, 0))).unwrap();
+    stream.set_read_timeout(Some(Duration::new(240, 0))).unwrap();
     let mut confirm_buffer = [0; 512];
     match stream.read(&mut confirm_buffer) {
         Ok(confirm_bytes_read) if confirm_bytes_read > 0 => {
